@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.validation.constraints.Null;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -103,5 +104,35 @@ public class PostsApiControllerTest {
         List<Posts> all = postsRepository.findAll();
         assertThat(all.get(0).getTitle()).isEqualTo(expectedTitle);
         assertThat(all.get(0).getContent()).isEqualTo(expectedContent);
+    }
+
+    @Test
+    public void Posts_삭제된다() throws Exception {
+        // given
+        String title = "title";
+        String content = "content";
+        String author = "author";
+        Posts savedPosts = postsRepository.save(Posts.builder()
+                .title(title)
+                .author(author)
+                .content(content)
+                .build()
+        );
+
+        Long deleteId = savedPosts.getId();
+
+        String url = "http://localhost:" + port + "/api/v1/posts/" + deleteId;
+
+
+        //when
+        ResponseEntity<Long> responseEntity = restTemplate.exchange(url, HttpMethod.DELETE, null, Long.class);
+
+        //then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        try {
+            Posts deletedPosts = postsRepository.findById(deleteId).orElseGet(null);
+        } catch (NullPointerException error) {
+            System.out.println(111);
+        }
     }
 }
