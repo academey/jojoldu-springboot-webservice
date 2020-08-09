@@ -22,6 +22,6 @@ public class IndexControllerTest {
 
         // then
 
-        assertThat(body).contains("스프링 부트");
+        assertThat(body).contains("스프링부트");
     }
 }
